@@ -3,7 +3,7 @@ import { pool } from "../db.js";
 export const getTasks = async (req, res) => {
   try {
     const [result] = await pool.query(
-      "SELECT * FROM tasks ORDER BY createAt ASC"
+      "select * from tienda order by nombreTienda asc"
     );
     res.json(result);
   } catch (error) {
