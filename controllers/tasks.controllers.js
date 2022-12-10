@@ -11,6 +11,30 @@ export const getTasks = async (req, res) => {
   }
 };
 
+export const getPedidos = async (req, res) => {
+  try {
+    const [result] = await pool.query(
+      "select * from  pedido order by horaPedido asc"
+    );
+    res.json(result);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+export const getLocales = async (req, res) => {
+  try {
+    const [result] = await pool.query (
+      "select * from tienda order by nombreTienda asc"
+    )
+    
+  } catch (error) {
+    
+  }
+}
+
 export const getTask = async (req, res) => {
   try {
     const [result] = await pool.query("SELECT * FROM tasks WHERE id = ?", [
