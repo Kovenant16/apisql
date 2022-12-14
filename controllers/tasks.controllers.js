@@ -108,7 +108,7 @@ export const getHorariosPorTienda = async (req, res) => {
 
 export const getTipoUsuario = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT * FROM tipoUsuario;");
+        const [result] = await pool.query("SELECT * FROM tipousuario;");
 
         if (result.length === 0)
             return res.status(404).json({ message: "No hay tipos de usuario" });
