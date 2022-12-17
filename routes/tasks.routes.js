@@ -28,7 +28,6 @@ import {
   getCountTiendas,
   createTienda,
   createHorario,
-  getSumasPorMotorizado,
   getVariantesPorProducto,
   createTipoProducto,
   createProducto,
@@ -38,7 +37,11 @@ import {
   createUbicacion,
   createPedido,
   createDetallePedido,
-  getPedidosPendientes
+  getPedidosPendientes,
+  getConsolidadoMotorizados,
+  getConsolidadoLocales,
+  getConsolidadoTransferencias,
+  getClientes
 } from "../controllers/tasks.controllers.js";
 
 const router = Router();
@@ -62,6 +65,8 @@ router.get("/horarios/:nombreTienda", getHorariosPorTienda);
 router.get("/tiposUsuario", getTipoUsuario);
 
 router.get("/usuarioPorTipo/:nombreTipoUsuario", getUsuarioPorTipo);
+
+router.get("/clientes", getClientes);
 
 router.get("/tiendasAbiertas", getLocalesAbiertosAhora);
 
@@ -93,7 +98,11 @@ router.get("/countPedidosPorTienda/:nombreTienda/:fechaIni/:fechaFin", getCountP
 
 router.get("/countPedidosPorMotorizado/:nombreMotorizado/:fechaIni/:fechaFin", getCountPedidosPorMotorizado);
 
-router.get("/sumasPorMotorizado/:nombreMotorizado/:fechaIni/:fechaFin", getSumasPorMotorizado);
+router.get("/consolidadoMotorizados/:fechaIni/:fechaFin", getConsolidadoMotorizados);
+
+router.get("/consolidadoTransferencias/:fechaIni/:fechaFin", getConsolidadoTransferencias);
+
+router.get("/consolidadoLocales/:fechaIni/:fechaFin", getConsolidadoLocales);
 
 
 router.post("/crearTipoLocal", createTipoLocal);
@@ -123,7 +132,5 @@ router.post("/crearDetallePedido", createDetallePedido);
 router.put("/tasks/:id", updateTask);
 
 router.delete("/tasks/:id", deleteTask);
-
-//hola
 
 export default router;

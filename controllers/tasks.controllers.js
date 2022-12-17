@@ -3,7 +3,7 @@ import { pool } from "../db.js";
 export const getPedidosPendientes = async (req, res) => {
     try {
         const [result] = await pool.query(
-            "SELECT idPedido, (select nombreUsuario from usuario where idUsuario=idMotorizado) motorizado, (select nombreUsuario from usuario where idUsuario=idGenerado) 'generado por', DATE_FORMAT(fechaPedido, '%d-%m-%Y') fecha, horaPedido, montoPedido, comisionVentaPedido, montoDeliveryPedido, horaLlegadaLocalPedido, horaRecojoPedido, estadoPedido, nombreTienda, direccionUbicacion, latUbicacion, longUbicacion, telefonoUbicacion, referenciaUbicacion FROM pedido p, usuario us, ubicacion ub, tienda t WHERE us.idUsuario=p.idMotorizado AND ub.idUbicacion=p.idUbicacion AND t.idTienda=p.idTienda AND estadoPedido != 'Entregado' ORDER BY fechaPedido, horaPedido LIMIT 20;"
+            "SELECT idPedido, (select nombreUsuario from usuario where idUsuario=idMotorizado) motorizado, (select nombreUsuario from usuario where idUsuario=idGenerado) 'generado por', DATE_FORMAT(fechaPedido, '%d-%m-%Y') fecha, horaPedido, montoPedido,  comisionVentaPedido, montoDeliveryPedido, horaLlegadaLocalPedido, horaRecojoPedido, estadoPedido, nombreTienda, latTienda, longTienda, direccionUbicacion, latUbicacion, longUbicacion, telefonoUbicacion, referenciaUbicacion FROM pedido p, usuario us, ubicacion ub, tienda t WHERE us.idUsuario=p.idMotorizado AND ub.idUbicacion=p.idUbicacion AND t.idTienda=p.idTienda AND estadoPedido = 'Entregado' ORDER BY fechaPedido, horaPedido LIMIT 20;"
         );
         res.json(result);
     } catch (error) {
@@ -108,7 +108,7 @@ export const getHorariosPorTienda = async (req, res) => {
 
 export const getTipoUsuario = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT * FROM tipousuario;");
+        const [result] = await pool.query("SELECT * FROM tipoUsuario;");
 
         if (result.length === 0)
             return res.status(404).json({ message: "No hay tipos de usuario" });
@@ -127,6 +127,21 @@ export const getUsuarioPorTipo = async (req, res) => {
 
         if (result.length === 0)
             return res.status(404).json({ message: "Usuarios inexistentes" });
+
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const getClientes = async (req, res) => {
+    try {
+        const [result] = await pool.query(
+            "SELECT * FROM usuario us, ubicacion ub WHERE idTipoUsuario = 5 AND us.idUsuario=ub.idUsuario;"
+        );
+        
+        if (result.length === 0)
+            return res.status(404).json({ message: "Aún no se registran clientes" });
 
         res.json(result);
     } catch (error) {
@@ -329,7 +344,7 @@ export const getCountUsuarioPorTipo = async (req, res) => {
 
 export const getCountPedidosPorTienda = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT COUNT(DISTINCT(p.idPedido)) FROM pedido p, detallepedido d, producto pr, tienda t WHERE p.idPedido=d.idPedido AND d.idProducto=pr.idProducto AND t.idTienda=pr.idTienda AND t.nombreTienda=? AND ? <= fechaPedido AND fechaPedido <= ?;", [
+        const [result] = await pool.query("SELECT COUNT(*) FROM pedido p, tienda t WHERE t.idTienda=p.idTienda AND t.nombreTienda='Pizza Bruno' AND '20221024' <= fechaPedido AND fechaPedido <= '20221225';", [
             req.params.nombreTienda,
             req.params.fechaIni,
             req.params.fechaFin
@@ -338,7 +353,7 @@ export const getCountPedidosPorTienda = async (req, res) => {
         if (result.length === 0)
             return res.status(404).json({ message: "No hay pedidos de esta tienda" });
 
-        res.json(result[0]["COUNT(DISTINCT(p.idPedido))"]);
+        res.json(result[0]["COUNT(*)"]);
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -361,18 +376,49 @@ export const getCountPedidosPorMotorizado = async (req, res) => {
     }
 };
 
-export const getSumasPorMotorizado = async (req, res) => {
+export const getConsolidadoMotorizados = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT SUM(montoDeliveryPedido) deliveryTotal, SUM(comisionVentaPedido) comisionVentaTotal FROM pedido p, usuario u WHERE p.idMotorizado = u.idUsuario AND u.nombreUsuario=? AND ? < fechaPedido < ?;", [
-            req.params.nombreMotorizado,
+        const [result] = await pool.query("SELECT idMotorizado, nombreUsuario, SUM(montoDeliveryPedido) delivery, SUM(comisionVentaPedido) 'comisión venta', COUNT(p.idPedido) pedidos FROM pedido p, usuario u WHERE u.idUsuario=p.idMotorizado AND ? < fechaPedido AND fechaPedido < ? GROUP BY idMotorizado ORDER BY delivery DESC;", [
             req.params.fechaIni,
             req.params.fechaFin
         ]);
 
         if (result.length === 0)
-            return res.status(404).json({ message: "No hay pedidos de este motorizado" });
+            return res.status(404).json({ message: "No hay pedidos de este mes" });
 
-        res.json(result[0]);
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const getConsolidadoTransferencias = async (req, res) => {
+    try {
+        const [result] = await pool.query("SELECT idMotorizado, nombreUsuario, COUNT(DISTINCT(p.idPedido)) pedidos, COUNT(DISTINCT(t.idTransferencia)) transferencias, SUM(montoTransferencia) total FROM pedido p, usuario u, transferencia t WHERE u.idUsuario=p.idMotorizado AND p.idPedido=t.idPedido AND ? < fechaPedido AND fechaPedido < ? GROUP BY idMotorizado;", [
+            req.params.fechaIni,
+            req.params.fechaFin
+        ]);
+
+        if (result.length === 0)
+            return res.status(404).json({ message: "No hay pedidos de este mes" });
+
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const getConsolidadoLocales = async (req, res) => {
+    try {
+        const [result] = await pool.query("SELECT nombreTienda, SUM(montoDeliveryPedido) delivery, SUM(comisionVentaPedido) 'comisión venta', COUNT(montoDeliveryPedido) pedidos FROM pedido p, tienda t WHERE t.idTienda=p.idTienda AND ? < fechaPedido AND fechaPedido < ? GROUP BY p.idTienda ORDER BY delivery DESC;", [
+            req.params.fechaIni,
+            req.params.fechaFin
+        ]);
+
+        if (result.length === 0)
+            return res.status(404).json({ message: "No hay pedidos de este mes" });
+
+        res.json(result);
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
