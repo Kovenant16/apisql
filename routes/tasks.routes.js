@@ -6,7 +6,6 @@ import {
   updateTask,
   getCategoriesPorTienda,
   createTipoLocal,
-  productosPorTienda,
   getHorariosPorTienda,
   getTipoUsuario,
   getUsuarioPorTipo,
@@ -41,7 +40,8 @@ import {
   getConsolidadoMotorizados,
   getConsolidadoLocales,
   getConsolidadoTransferencias,
-  getClientes
+  getClientes,
+  getProductosPorTienda
 } from "../controllers/tasks.controllers.js";
 
 const router = Router();
@@ -54,7 +54,7 @@ router.get("/locales", getLocales);
 
 router.get("/local/:nombreTienda", getLocal);
 
-router.get('/productos/:nombreTienda', productosPorTienda);
+router.get('/productos/:nombreTienda', getProductosPorTienda);
 
 router.get("/categorias/:nombreTienda", getCategoriesPorTienda);
 
