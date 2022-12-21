@@ -190,7 +190,7 @@ export const getDescuentosVigentes = async (req, res) => {
 
 export const getUbicacionPorUsuario = async (req, res) => {
     try {
-        const [result] = await pool.query(`SELECT idUbicacion, ub.idUsuario, telefonoUbicacion, direccionUbicacion, latUbicacion, longUbicacion, referenciaUbicacion, asuntoUbicacion FROM ubicacion ub, usuario us WHERE ub.idUsuario = us.idUsuario AND ub.telefonoUbicacion like ${"?"+"%"}`, [
+        const [result] = await pool.query(`SELECT idUbicacion, ub.idUsuario, telefonoUbicacion, direccionUbicacion, latUbicacion, longUbicacion, referenciaUbicacion, asuntoUbicacion FROM ubicacion ub, usuario us WHERE ub.idUsuario = us.idUsuario AND ub.telefonoUbicacion like CONCAT(?, '%')`, [
             req.params.nombreUsuario,
         ]);
 
