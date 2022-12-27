@@ -25,7 +25,7 @@ export const getProductos = async (req, res) => {
 export const getLocales = async (req, res) => {
     try {
         const [result] = await pool.query(
-            "select *, DATE_FORMAT(fechaActualizacionTienda, '%Y-%m-%d') fechaActualizacion from  tienda"
+            "select *, DATE_FORMAT(fechaActualizacionTienda, '%Y-%m-%d') fechaActualizacion from  tienda order by nombreTienda asc"
         );
         res.json(result);
     } catch (error) {
