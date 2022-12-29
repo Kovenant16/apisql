@@ -378,7 +378,7 @@ export const getCountPedidosPorMotorizado = async (req, res) => {
 
 export const getConsolidadoMotorizados = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT idMotorizado, nombreUsuario, SUM(montoDeliveryPedido) delivery, SUM(comisionVentaPedido) 'comisión venta', COUNT(p.idPedido) pedidos FROM pedido p, usuario u WHERE u.idUsuario=p.idMotorizado AND ? < fechaPedido AND fechaPedido < ? GROUP BY idMotorizado ORDER BY delivery DESC;", [
+        const [result] = await pool.query("SELECT idMotorizado, nombreUsuario, SUM(montoDeliveryPedido) delivery, SUM(comisionVentaPedido) 'comVenta', COUNT(p.idPedido) pedidos FROM pedido p, usuario u WHERE u.idUsuario=p.idMotorizado AND ? < fechaPedido AND fechaPedido < ? GROUP BY idMotorizado ORDER BY delivery DESC;", [
             req.params.fechaIni,
             req.params.fechaFin
         ]);
