@@ -104,6 +104,8 @@ router.get("/consolidadoTransferencias/:fechaIni/:fechaFin", getConsolidadoTrans
 
 router.get("/consolidadoLocales/:fechaIni/:fechaFin", getConsolidadoLocales);
 
+router.get("/usuarioPorTelefono/:telefono", getUsuarioPorTelefono);
+
 
 router.post("/crearTipoLocal", createTipoLocal);
 

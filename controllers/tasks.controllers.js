@@ -605,6 +605,22 @@ export const createUbicacion = async (req, res) => {
     }
 };
 
+export const getUsuarioPorTelefono = async (req, res) => {
+    try {
+        const [result] = await pool.query(
+            "SELECT * FROM usuario WHERE telefonoUsuario LIKE CONCAT(?, '%');", [
+                req.params.telefono,
+            ]);
+        
+        if (result.length === 0)
+            return res.status(404).json({ message: "No existe usuario con este teléfono" });
+
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 export const createPedido = async (req, res) => {
     try {
         const { idDescuento, idCliente, idMotorizado, idGenerado, idUbicacion, idTienda, fechaPedido, horaPedido, horaGeneradoPedido, montoPedido, comisionVentaPedido, montoDeliveryPedido, horaLlegadaLocalPedido, horaRecojoPedido, horaEntregaPedido, estadoPedido } = req.body;
