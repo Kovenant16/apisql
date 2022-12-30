@@ -42,7 +42,8 @@ import {
   getConsolidadoTransferencias,
   getClientes,
   getProductosPorTienda,
-  getUsuarioPorTelefono
+  getUsuarioPorTelefono,
+  getPedidosPorMotorizadoPorEstado
 } from "../controllers/tasks.controllers.js";
 
 const router = Router();
@@ -106,6 +107,8 @@ router.get("/consolidadoTransferencias/:fechaIni/:fechaFin", getConsolidadoTrans
 router.get("/consolidadoLocales/:fechaIni/:fechaFin", getConsolidadoLocales);
 
 router.get("/usuarioPorTelefono/:telefono", getUsuarioPorTelefono);
+
+router.get("/pedidosPorMotorizadoPorEstado/:motorizado/:estado", getPedidosPorMotorizadoPorEstado);
 
 
 router.post("/crearTipoLocal", createTipoLocal);
