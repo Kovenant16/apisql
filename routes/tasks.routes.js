@@ -41,7 +41,8 @@ import {
   getConsolidadoLocales,
   getConsolidadoTransferencias,
   getClientes,
-  getProductosPorTienda
+  getProductosPorTienda,
+  getUsuarioPorTelefono
 } from "../controllers/tasks.controllers.js";
 
 const router = Router();
