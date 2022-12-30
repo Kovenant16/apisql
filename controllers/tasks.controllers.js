@@ -605,6 +605,22 @@ export const createUbicacion = async (req, res) => {
     }
 };
 
+export const getPedidosPorMotorizadoPorEstado = async (req, res) => {
+    try {
+        const [result] = await pool.query("SELECT *, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fechaPedido FROM pedido p, usuario u, tienda t WHERE idUsuario = idMotorizado AND t.idTienda=p.idTienda AND nombreUsuario = ? AND estadoPedido = ? ORDER BY fechaPedido, horaPedido LIMIT 50;", [
+            req.params.motorizado,
+            req.params.estado
+        ]);
+
+        if (result.length === 0)
+            return res.status(404).json({ message: "Motorizado sin Pedidos con este estado" });
+
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 export const getUsuarioPorTelefono = async (req, res) => {
     try {
         const [result] = await pool.query(
