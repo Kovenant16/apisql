@@ -546,16 +546,17 @@ export const createTipoUsuario = async (req, res) => {
 
 export const createUsuario = async (req, res) => {
     try {
-        const { idTipoUsuario, nombreUsuario, contraseñaUsuario } = req.body;
+        const { idTipoUsuario, nombreUsuario, contraseñaUsuario, telefonoUsuario } = req.body;
         const [result] = await pool.query(
-            "INSERT INTO usuario (idTipoUsuario, nombreUsuario, contraseñaUsuario) VALUES (?, ?, ?);",
-            [idTipoUsuario, nombreUsuario, contraseñaUsuario]
+            "INSERT INTO usuario (idTipoUsuario, nombreUsuario, contraseñaUsuario, telefonoUsuario) VALUES (?, ?, ?, ?);",
+            [idTipoUsuario, nombreUsuario, contraseñaUsuario, telefonoUsuario]
         );
         res.json({
             id: result.insertId,
             idTipoUsuario,
             nombreUsuario,
-            contraseñaUsuario
+            contraseñaUsuario,
+            telefonoUsuario
         });
     } catch (error) {
         return res.status(500).json({ message: error.message });
