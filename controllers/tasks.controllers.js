@@ -25,7 +25,7 @@ export const getProductos = async (req, res) => {
 export const getLocales = async (req, res) => {
     try {
         const [result] = await pool.query(
-            "select *, DATE_FORMAT(fechaActualizacionTienda, '%Y-%m-%d') fechaActualizacion from  tienda order by nombreTienda asc"
+            "select *, DATE_FORMAT(fechaActualizacionTienda, '%Y-%m-%d') fechaActualizacion from  tienda"
         );
         res.json(result);
     } catch (error) {
@@ -121,7 +121,7 @@ export const getTipoUsuario = async (req, res) => {
 
 export const getUsuarioPorTipo = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT u.idUsuario, u.nombreUsuario, u.telefonoUsuario FROM usuario u, tipousuario tu WHERE u.idTipoUsuario = tu.idTipoUsuario AND nombreTipoUsuario = ? order by nombreUsuario asc;", [
+        const [result] = await pool.query("SELECT u.idUsuario, u.nombreUsuario, contraseñaUsuario FROM usuario u, tipousuario tu WHERE u.idTipoUsuario = tu.idTipoUsuario AND nombreTipoUsuario = ?;", [
             req.params.nombreTipoUsuario,
         ]);
 
@@ -142,6 +142,22 @@ export const getClientes = async (req, res) => {
         
         if (result.length === 0)
             return res.status(404).json({ message: "Aún no se registran clientes" });
+
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const getUsuarioPorTelefono = async (req, res) => {
+    try {
+        const [result] = await pool.query(
+            "SELECT * FROM usuario WHERE telefonoUsuario LIKE CONCAT(?, '%');", [
+                req.params.telefono,
+            ]);
+        
+        if (result.length === 0)
+            return res.status(404).json({ message: "No existe usuario con este teléfono" });
 
         res.json(result);
     } catch (error) {
@@ -190,8 +206,8 @@ export const getDescuentosVigentes = async (req, res) => {
 
 export const getUbicacionPorUsuario = async (req, res) => {
     try {
-        const [result] = await pool.query(`SELECT idUbicacion, ub.idUsuario, telefonoUbicacion, direccionUbicacion, latUbicacion, longUbicacion, referenciaUbicacion, asuntoUbicacion FROM ubicacion ub, usuario us WHERE ub.idUsuario = us.idUsuario AND ub.telefonoUbicacion like CONCAT(?, '%')`, [
-            req.params.nombreUsuario,
+        const [result] = await pool.query("SELECT idUbicacion, ub.idUsuario, telefonoUbicacion, direccionUbicacion, latUbicacion, longUbicacion, referenciaUbicacion, asuntoUbicacion FROM ubicacion ub, usuario us WHERE ub.idUsuario = us.idUsuario AND ub.telefonoUbicacion LIKE CONCAT(?,'%');", [
+            req.params.telefonoUbicacion,
         ]);
 
         if (result.length === 0)
@@ -205,7 +221,7 @@ export const getUbicacionPorUsuario = async (req, res) => {
 
 export const getPedidosPorEstado = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT *, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fechaPedido FROM pedido WHERE estadoPedido = ? ORDER BY fechaPedido, horaPedido LIMIT 50;", [
+        const [result] = await pool.query("SELECT *, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fechaPedido FROM pedido p, tienda t WHERE estadoPedido = ? AND t.idTienda=p.idTienda ORDER BY fechaPedido, horaPedido LIMIT 50;", [
             req.params.estado,
             req.params.limit
         ]);
@@ -221,7 +237,7 @@ export const getPedidosPorEstado = async (req, res) => {
 
 export const getPedidosPorMotorizado = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT *, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fechaPedido FROM pedido p, usuario u WHERE idUsuario = idMotorizado AND nombreUsuario = ? ORDER BY fechaPedido, horaPedido LIMIT 50;", [
+        const [result] = await pool.query("SELECT *, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fechaPedido FROM pedido p, usuario u, tienda t WHERE idUsuario = idMotorizado AND t.idTienda=p.idTienda AND nombreUsuario = ? ORDER BY fechaPedido, horaPedido LIMIT 50;", [
             req.params.motorizado,
         ]);
 
@@ -234,9 +250,25 @@ export const getPedidosPorMotorizado = async (req, res) => {
     }
 };
 
+export const getPedidosPorMotorizadoPorEstado = async (req, res) => {
+    try {
+        const [result] = await pool.query("SELECT *, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fechaPedido FROM pedido p, usuario u, tienda t WHERE idUsuario = idMotorizado AND t.idTienda=p.idTienda AND nombreUsuario = ? AND estadoPedido = ? ORDER BY fechaPedido, horaPedido LIMIT 50;", [
+            req.params.motorizado,
+            req.params.estado
+        ]);
+
+        if (result.length === 0)
+            return res.status(404).json({ message: "Motorizado sin Pedidos con este estado" });
+
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 export const getPedidosPorCliente = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT *, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fechaPedido FROM pedido p, usuario u WHERE idUsuario = idCliente AND nombreUsuario = ? ORDER BY fechaPedido, horaPedido LIMIT 50;", [
+        const [result] = await pool.query("SELECT *, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fechaPedido FROM pedido p, usuario u, tienda t WHERE idUsuario = idCliente AND t.idTienda=p.idTienda AND nombreUsuario = ? ORDER BY fechaPedido, horaPedido LIMIT 50;", [
             req.params.cliente,
             req.params.limit
         ]);
@@ -253,7 +285,7 @@ export const getPedidosPorCliente = async (req, res) => {
 // Quién generó el pedido
 export const getPedidosPorGenerado = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT *, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fechaPedido FROM pedido p, usuario u WHERE idUsuario = idGenerado AND nombreUsuario = ? ORDER BY fechaPedido, horaPedido LIMIT 50;", [
+        const [result] = await pool.query("SELECT *, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fechaPedido FROM pedido p, usuario u, tienda t WHERE idUsuario = idGenerado AND t.idTienda=p.idTienda AND nombreUsuario = ? ORDER BY fechaPedido, horaPedido LIMIT 50;", [
             req.params.usuario,
             req.params.limit
         ]);
@@ -269,7 +301,7 @@ export const getPedidosPorGenerado = async (req, res) => {
 
 export const getPedidosPorFecha = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT *, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fechaPedido FROM pedido WHERE ? <= fechaPedido AND fechaPedido <= ?", [
+        const [result] = await pool.query("SELECT *, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fechaPedido FROM pedido p, tienda t WHERE ? <= fechaPedido AND fechaPedido <= ? AND t.idTienda=p.idTienda", [
             req.params.fechaIni,
             req.params.fechaFin,
         ]);
@@ -606,38 +638,6 @@ export const createUbicacion = async (req, res) => {
     }
 };
 
-export const getPedidosPorMotorizadoPorEstado = async (req, res) => {
-    try {
-        const [result] = await pool.query("SELECT *, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fechaPedido FROM pedido p, usuario u, tienda t WHERE idUsuario = idMotorizado AND t.idTienda=p.idTienda AND nombreUsuario = ? AND estadoPedido = ? ORDER BY fechaPedido, horaPedido LIMIT 50;", [
-            req.params.motorizado,
-            req.params.estado
-        ]);
-
-        if (result.length === 0)
-            return res.status(404).json({ message: "Motorizado sin Pedidos con este estado" });
-
-        res.json(result);
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-};
-
-export const getUsuarioPorTelefono = async (req, res) => {
-    try {
-        const [result] = await pool.query(
-            "SELECT * FROM usuario WHERE telefonoUsuario LIKE CONCAT(?, '%');", [
-                req.params.telefono,
-            ]);
-        
-        if (result.length === 0)
-            return res.status(404).json({ message: "No existe usuario con este teléfono" });
-
-        res.json(result);
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-};
-
 export const createPedido = async (req, res) => {
     try {
         const { idDescuento, idCliente, idMotorizado, idGenerado, idUbicacion, idTienda, fechaPedido, horaPedido, horaGeneradoPedido, montoPedido, comisionVentaPedido, montoDeliveryPedido, horaLlegadaLocalPedido, horaRecojoPedido, horaEntregaPedido, estadoPedido } = req.body;
@@ -687,17 +687,66 @@ export const createDetallePedido = async (req, res) => {
     }
 };
 
-
-
-
-
-
-
-
-
-export const updateTask = async (req, res) => {
+export const createVariante_Producto = async (req, res) => {
     try {
-        const result = await pool.query("UPDATE tasks SET ? WHERE id = ?", [
+        const { idProducto, nombreVariante, caracteristicaVariante, precioVariante } = req.body;
+        const [result] = await pool.query(
+            "INSERT INTO variante_producto (idProducto, nombreVariante, caracteristicaVariante, precioVariante) VALUES (?, ?, ?, ?);",
+            [idProducto, nombreVariante, caracteristicaVariante, precioVariante]
+        );
+        res.json({
+            id: result.insertId,
+            idProducto,
+            nombreVariante,
+            caracteristicaVariante,
+            precioVariante
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const createTipoTransferencia = async (req, res) => {
+    try {
+        const { nombreTipoTransferencia } = req.body;
+        const [result] = await pool.query(
+            "INSERT INTO tipotransferencia (nombreTipoTransferencia) VALUES (?);",
+            [nombreTipoTransferencia]
+        );
+        res.json({
+            id: result.insertId,
+            nombreTipoTransferencia
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const createTransferencia = async (req, res) => {
+    try {
+        const { idTipoTransferencia, idPedido, montoTransferencia, descripcionTransferencia } = req.body;
+        const [result] = await pool.query(
+            "INSERT INTO variante_producto (idTipoTransferencia, idPedido, montoTransferencia, descripcionTransferencia) VALUES (?, ?, ?, ?);",
+            [idTipoTransferencia, idPedido, montoTransferencia, descripcionTransferencia]
+        );
+        res.json({
+            id: result.insertId,
+            idTipoTransferencia,
+            idPedido,
+            montoTransferencia,
+            descripcionTransferencia
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+
+//EDITAR
+
+export const updateTipoLocal = async (req, res) => {
+    try {
+        const result = await pool.query("UPDATE tipolocal SET ? WHERE idTipoLocal = ?", [
             req.body,
             req.params.id,
         ]);
@@ -707,14 +756,187 @@ export const updateTask = async (req, res) => {
     }
 };
 
-export const deleteTask = async (req, res) => {
+export const updateTienda = async (req, res) => {
     try {
-        const [result] = await pool.query("DELETE FROM tasks WHERE id = ?", [
+        const result = await pool.query("UPDATE tienda SET ? WHERE idTienda = ?", [
+            req.body,
+            req.params.id,
+        ]);
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const updateHorario = async (req, res) => {
+    try {
+        const result = await pool.query("UPDATE horario SET ? WHERE idHorario = ?", [
+            req.body,
+            req.params.id,
+        ]);
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const updateTipoProducto = async (req, res) => {
+    try {
+        const result = await pool.query("UPDATE tipoproducto SET ? WHERE idTipoProducto = ?", [
+            req.body,
+            req.params.id,
+        ]);
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const updateProducto = async (req, res) => {
+    try {
+        const result = await pool.query("UPDATE producto SET ? WHERE idProducto = ?", [
+            req.body,
+            req.params.id,
+        ]);
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const updateTipoUsuario = async (req, res) => {
+    try {
+        const result = await pool.query("UPDATE tipousuario SET ? WHERE idTipoUsuario = ?", [
+            req.body,
+            req.params.id,
+        ]);
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const updateUsuario = async (req, res) => {
+    try {
+        const result = await pool.query("UPDATE usuario SET ? WHERE idUsuario = ?", [
+            req.body,
+            req.params.id,
+        ]);
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const updateUbicacion = async (req, res) => {
+    try {
+        const result = await pool.query("UPDATE ubicacion SET ? WHERE idUbicacion = ?", [
+            req.body,
+            req.params.id,
+        ]);
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const updateDescuento = async (req, res) => {
+    try {
+        const result = await pool.query("UPDATE descuento SET ? WHERE idDescuento = ?", [
+            req.body,
+            req.params.id,
+        ]);
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const updatePedido = async (req, res) => {
+    try {
+        const result = await pool.query("UPDATE pedido SET ? WHERE idPedido = ?", [
+            req.body,
+            req.params.id,
+        ]);
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const updateDetallePedido = async (req, res) => {
+    try {
+        const result = await pool.query("UPDATE detallepedido SET ? WHERE idDetallePedido = ?", [
+            req.body,
+            req.params.id,
+        ]);
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const updateVarianteProducto = async (req, res) => {
+    try {
+        const result = await pool.query("UPDATE variante_producto SET ? WHERE idVariante_producto = ?", [
+            req.body,
+            req.params.id,
+        ]);
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const updateTipoTransferencia = async (req, res) => {
+    try {
+        const result = await pool.query("UPDATE tipotransferencia SET ? WHERE idTipoTransferencia = ?", [
+            req.body,
+            req.params.id,
+        ]);
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const updateTransferencia = async (req, res) => {
+    try {
+        const result = await pool.query("UPDATE transferencia SET ? WHERE idTransferencia = ?", [
+            req.body,
+            req.params.id,
+        ]);
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+//ELIMINAR
+
+export const deleteDetallePedido = async (req, res) => {
+    try {
+        const [result] = await pool.query("DELETE FROM detallepedido WHERE idDetallePedido = ?", [
             req.params.id,
         ]);
 
         if (result.affectedRows === 0)
-            return res.status(404).json({ message: "Task not found" });
+            return res.status(404).json({ message: "Detalle no encontrado" });
+
+        return res.sendStatus(204);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteProducto = async (req, res) => {
+    try {
+        const [result] = await pool.query("DELETE FROM producto WHERE idProducto = ?", [
+            req.params.id,
+        ]);
+
+        if (result.affectedRows === 0)
+            return res.status(404).json({ message: "Producto no encontrado" });
 
         return res.sendStatus(204);
     } catch (error) {

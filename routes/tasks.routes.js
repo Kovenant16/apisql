@@ -2,8 +2,6 @@ import { Router } from "express";
 import {
   getProductos,
   getLocales,
-  deleteTask,
-  updateTask,
   getCategoriesPorTienda,
   createTipoLocal,
   getHorariosPorTienda,
@@ -42,8 +40,27 @@ import {
   getConsolidadoTransferencias,
   getClientes,
   getProductosPorTienda,
-  getUsuarioPorTelefono,
-  getPedidosPorMotorizadoPorEstado
+  createVariante_Producto,
+  createTipoTransferencia,
+  createTransferencia,
+  updateTipoLocal,
+  updateTienda,
+  updateHorario,
+  updateProducto,
+  updateTipoProducto,
+  updateTipoUsuario,
+  updateUsuario,
+  updateUbicacion,
+  updateDescuento,
+  updatePedido,
+  updateDetallePedido,
+  updateVarianteProducto,
+  updateTipoTransferencia,
+  updateTransferencia,
+  deleteProducto,
+  deleteDetallePedido,
+  getPedidosPorMotorizadoPorEstado,
+  getUsuarioPorTelefono
 } from "../controllers/tasks.controllers.js";
 
 const router = Router();
@@ -70,17 +87,21 @@ router.get("/usuarioPorTipo/:nombreTipoUsuario", getUsuarioPorTipo);
 
 router.get("/clientes", getClientes);
 
+router.get("/usuarioPorTelefono/:telefono", getUsuarioPorTelefono);
+
 router.get("/tiendasAbiertas", getLocalesAbiertosAhora);
 
 router.get("/descuentos", getDescuentos);
 
 router.get("/descuentosVigentes", getDescuentosVigentes);
 
-router.get("/ubicacionUsuario/:nombreUsuario", getUbicacionPorUsuario);
+router.get("/ubicacionUsuario/:telefonoUbicacion", getUbicacionPorUsuario);
 
 router.get("/pedidosPorEstado/:estado", getPedidosPorEstado);
 
 router.get("/pedidosPorMotorizado/:motorizado", getPedidosPorMotorizado);
+
+router.get("/pedidosPorMotorizadoPorEstado/:motorizado/:estado", getPedidosPorMotorizadoPorEstado);
 
 router.get("/pedidosPorCliente/:cliente", getPedidosPorCliente);
 
@@ -106,10 +127,6 @@ router.get("/consolidadoTransferencias/:fechaIni/:fechaFin", getConsolidadoTrans
 
 router.get("/consolidadoLocales/:fechaIni/:fechaFin", getConsolidadoLocales);
 
-router.get("/usuarioPorTelefono/:telefono", getUsuarioPorTelefono);
-
-router.get("/pedidosPorMotorizadoPorEstado/:motorizado/:estado", getPedidosPorMotorizadoPorEstado);
-
 
 router.post("/crearTipoLocal", createTipoLocal);
 
@@ -133,10 +150,44 @@ router.post("/crearPedido", createPedido);
 
 router.post("/crearDetallePedido", createDetallePedido);
 
+router.post("/crearVarianteProducto", createVariante_Producto);
+
+router.post("/crearTipoTransferencia", createTipoTransferencia);
+
+router.post("/crearTransferencia", createTransferencia);
 
 
-router.put("/tasks/:id", updateTask);
+router.put("/actualizarTipoLocal/:id", updateTipoLocal);
 
-router.delete("/tasks/:id", deleteTask);
+router.put("/actualizarTienda/:id", updateTienda);
+
+router.put("/actualizarHorario/:id", updateHorario);
+
+router.put("/actualizarTipoProducto/:id", updateTipoProducto);
+
+router.put("/actualizarProducto/:id", updateProducto);
+
+router.put("/actualizarTipoUsuario/:id", updateTipoUsuario);
+
+router.put("/actualizarUsuario/:id", updateUsuario);
+
+router.put("/actualizarUbicacion/:id", updateUbicacion);
+
+router.put("/actualizarDescuento/:id", updateDescuento);
+
+router.put("/actualizarPedido/:id", updatePedido);
+
+router.put("/actualizarDetallePedido/:id", updateDetallePedido);
+
+router.put("/actualizarVarianteProducto/:id", updateVarianteProducto);
+
+router.put("/actualizarTipoTransferencia/:id", updateTipoTransferencia);
+
+router.put("/actualizarTransferencia/:id", updateTransferencia);
+
+
+router.delete("/borrarProducto/:id", deleteProducto);
+
+router.delete("/borrarDetallePedido/:id", deleteDetallePedido);
 
 export default router;
