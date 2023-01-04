@@ -639,10 +639,10 @@ export const createUbicacion = async (req, res) => {
 
 export const createPedido = async (req, res) => {
     try {
-        const { idDescuento, idCliente, idMotorizado, idGenerado, idUbicacion, idTienda, fechaPedido, horaPedido, horaGeneradoPedido, montoPedido, comisionVentaPedido, montoDeliveryPedido, horaLlegadaLocalPedido, horaRecojoPedido, horaEntregaPedido, estadoPedido } = req.body;
+        const { idDescuento, idCliente, idMotorizado, idGenerado, idUbicacion, idTienda, fechaPedido, horaPedido, horaGeneradoPedido, montoPedido, comisionVentaPedido, montoDeliveryPedido, horaLlegadaLocalPedido, horaRecojoPedido, horaEntregaPedido, estadoPedido, detalleAdicionalPedido } = req.body;
         const [result] = await pool.query(
-            "INSERT INTO pedido (idDescuento, idCliente, idMotorizado, idGenerado, idUbicacion, idTienda, fechaPedido, horaPedido, horaGeneradoPedido, montoPedido, comisionVentaPedido, montoDeliveryPedido, horaLlegadaLocalPedido, horaRecojoPedido, horaEntregaPedido, estadoPedido) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-            [idDescuento, idCliente, idMotorizado, idGenerado, idUbicacion, idTienda, fechaPedido, horaPedido, horaGeneradoPedido, montoPedido, comisionVentaPedido, montoDeliveryPedido, horaLlegadaLocalPedido, horaRecojoPedido, horaEntregaPedido, estadoPedido]
+            "INSERT INTO pedido (idDescuento, idCliente, idMotorizado, idGenerado, idUbicacion, idTienda, fechaPedido, horaPedido, horaGeneradoPedido, montoPedido, comisionVentaPedido, montoDeliveryPedido, horaLlegadaLocalPedido, horaRecojoPedido, horaEntregaPedido, estadoPedido, detalleAdicionalPedido) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+            [idDescuento, idCliente, idMotorizado, idGenerado, idUbicacion, idTienda, fechaPedido, horaPedido, horaGeneradoPedido, montoPedido, comisionVentaPedido, montoDeliveryPedido, horaLlegadaLocalPedido, horaRecojoPedido, horaEntregaPedido, estadoPedido, detalleAdicionalPedido]
         );
         res.json({
             id: result.insertId,
@@ -661,7 +661,8 @@ export const createPedido = async (req, res) => {
             horaLlegadaLocalPedido, 
             horaRecojoPedido, 
             horaEntregaPedido, 
-            estadoPedido
+            estadoPedido,
+            detalleAdicionalPedido
         });
     } catch (error) {
         return res.status(500).json({ message: error.message });
