@@ -618,9 +618,9 @@ export const createDescuento = async (req, res) => {
 
 export const createUbicacion = async (req, res) => {
     try {
-        const { idUsuario, telefonoUbicacion, direccionUbicacion, latUbicacion, longUbicacion, referenciaUbicacion, asuntoUbicacion } = req.body;
+        const { idUsuario, telefonoUbicacion, direccionUbicacion, coordenadasUbicacion, referenciaUbicacion, asuntoUbicacion } = req.body;
         const [result] = await pool.query(
-            "INSERT INTO ubicacion (idUsuario, telefonoUbicacion, direccionUbicacion, latUbicacion, longUbicacion, referenciaUbicacion, asuntoUbicacion) VALUES (?, ?, ?, ?, ?, ?, ?);",
+            "INSERT INTO ubicacion (idUsuario, telefonoUbicacion, direccionUbicacion, coordenadasUbicacion, referenciaUbicacion, asuntoUbicacion) VALUES (?, ?, ?, ?, ?, ?);",
             [idUsuario, telefonoUbicacion, direccionUbicacion, latUbicacion, longUbicacion, referenciaUbicacion, asuntoUbicacion]
         );
         res.json({
@@ -628,8 +628,7 @@ export const createUbicacion = async (req, res) => {
             idUsuario,
             telefonoUbicacion,
             direccionUbicacion,
-            latUbicacion,
-            longUbicacion,
+            coordenadasUbicacion,
             referenciaUbicacion,
             asuntoUbicacion
         });
