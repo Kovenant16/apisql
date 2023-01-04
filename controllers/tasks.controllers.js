@@ -3,7 +3,7 @@ import { pool } from "../db.js";
 export const getPedidosPendientes = async (req, res) => {
     try {
         const [result] = await pool.query(
-            "SELECT idPedido, (select nombreUsuario from usuario where idUsuario=idMotorizado) motorizado, (select nombreUsuario from usuario where idUsuario=idGenerado) 'generado por', DATE_FORMAT(fechaPedido, '%Y-%m-%d') fecha, horaPedido, montoPedido,  comisionVentaPedido, montoDeliveryPedido, horaLlegadaLocalPedido, horaRecojoPedido, estadoPedido, nombreTienda, latTienda, longTienda, direccionUbicacion, latUbicacion, longUbicacion, telefonoUbicacion, referenciaUbicacion FROM pedido p, usuario us, ubicacion ub, tienda t WHERE us.idUsuario=p.idMotorizado AND ub.idUbicacion=p.idUbicacion AND t.idTienda=p.idTienda AND estadoPedido != 'Entregado' ORDER BY fechaPedido, horaPedido LIMIT 20;"
+            "SELECT idPedido, (select nombreUsuario from usuario where idUsuario=idMotorizado) motorizado, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fecha, horaPedido, montoPedido,  comisionVentaPedido, montoDeliveryPedido, horaLlegadaLocalPedido, horaRecojoPedido, estadoPedido, nombreTienda, coordenadasTienda, direccionUbicacion, coordenadasUbicacion, telefonoUbicacion, referenciaUbicacion FROM pedido p, usuario us, ubicacion ub, tienda t WHERE us.idUsuario=p.idMotorizado AND ub.idUbicacion=p.idUbicacion AND t.idTienda=p.idTienda AND estadoPedido != 'Entregado' ORDER BY fechaPedido, horaPedido LIMIT 20;"
         );
         res.json(result);
     } catch (error) {
