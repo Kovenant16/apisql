@@ -621,7 +621,7 @@ export const createUbicacion = async (req, res) => {
         const { idUsuario, telefonoUbicacion, direccionUbicacion, coordenadasUbicacion, referenciaUbicacion, asuntoUbicacion } = req.body;
         const [result] = await pool.query(
             "INSERT INTO ubicacion (idUsuario, telefonoUbicacion, direccionUbicacion, coordenadasUbicacion, referenciaUbicacion, asuntoUbicacion) VALUES (?, ?, ?, ?, ?, ?);",
-            [idUsuario, telefonoUbicacion, direccionUbicacion, latUbicacion, longUbicacion, referenciaUbicacion, asuntoUbicacion]
+            [idUsuario, telefonoUbicacion, direccionUbicacion, coordenadasUbicacion,  referenciaUbicacion, asuntoUbicacion]
         );
         res.json({
             id: result.insertId,
