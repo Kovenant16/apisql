@@ -105,6 +105,7 @@ router.get("/pedidosPorMotorizadoPorEstado/:motorizado/:estado", getPedidosPorMo
 
 router.get("/pedidosPorCliente/:cliente", getPedidosPorCliente);
 
+
 router.get("/pedidosPorUsuario/:usuario", getPedidosPorGenerado);
 
 router.get("/pedidosPorFecha/:fechaIni/:fechaFin", getPedidosPorFecha);

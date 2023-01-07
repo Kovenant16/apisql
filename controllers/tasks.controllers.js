@@ -25,7 +25,7 @@ export const getProductos = async (req, res) => {
 export const getLocales = async (req, res) => {
     try {
         const [result] = await pool.query(
-            "select *, DATE_FORMAT(fechaActualizacionTienda, '%Y-%m-%d') fechaActualizacion from  tienda"
+            "select *, DATE_FORMAT(fechaActualizacionTienda, '%Y-%m-%d') fechaActualizacion FROM tienda ORDER BY nombreTienda"
         );
         res.json(result);
     } catch (error) {
@@ -48,7 +48,7 @@ export const getLocal = async (req, res) => {
 
 export const getProductosPorTienda = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT * FROM producto P LEFT JOIN tienda T ON P.idTienda = T.idTienda WHERE T.nombreTienda = ?", [
+        const [result] = await pool.query("SELECT * FROM producto P LEFT JOIN tienda T ON P.idTienda = T.idTienda WHERE T.nombreTienda = ? ORDER BY nombreProducto", [
             req.params.nombreTienda,
         ]);
 
@@ -63,7 +63,7 @@ export const getProductosPorTienda = async (req, res) => {
 
 export const getCategoriesPorTienda = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT p.idTipoProducto, tp.nombreTipoProducto FROM producto p, tipoproducto tp, tienda t WHERE t.nombreTienda = ? AND  tp.idTipoProducto = p.idTipoProducto AND p.idTienda = t.idTienda GROUP BY idTipoProducto", [
+        const [result] = await pool.query("SELECT p.idTipoProducto, tp.nombreTipoProducto FROM producto p, tipoproducto tp, tienda t WHERE t.nombreTienda = ? AND  tp.idTipoProducto = p.idTipoProducto AND p.idTienda = t.idTienda GROUP BY idTipoProducto ORDER BY nombreTipoProducto", [
             req.params.nombreTienda,
         ]);
 
@@ -108,7 +108,7 @@ export const getHorariosPorTienda = async (req, res) => {
 
 export const getTipoUsuario = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT * FROM tipoUsuario;");
+        const [result] = await pool.query("SELECT * FROM tipousuario ORDER BY nombreTipoUsuario;");
 
         if (result.length === 0)
             return res.status(404).json({ message: "No hay tipos de usuario" });
@@ -121,7 +121,7 @@ export const getTipoUsuario = async (req, res) => {
 
 export const getUsuarioPorTipo = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT u.idUsuario, u.nombreUsuario, contraseñaUsuario FROM usuario u, tipousuario tu WHERE u.idTipoUsuario = tu.idTipoUsuario AND nombreTipoUsuario = ?;", [
+        const [result] = await pool.query("SELECT u.idUsuario, u.nombreUsuario, contraseñaUsuario FROM usuario u, tipousuario tu WHERE u.idTipoUsuario = tu.idTipoUsuario AND nombreTipoUsuario = ? ORDER BY nombreUsuario ASC;", [
             req.params.nombreTipoUsuario,
         ]);
 
@@ -137,7 +137,7 @@ export const getUsuarioPorTipo = async (req, res) => {
 export const getClientes = async (req, res) => {
     try {
         const [result] = await pool.query(
-            "SELECT * FROM usuario us, ubicacion ub WHERE idTipoUsuario = 5 AND us.idUsuario=ub.idUsuario;"
+            "SELECT * FROM usuario us, ubicacion ub WHERE idTipoUsuario = 5 AND us.idUsuario=ub.idUsuario ORDER BY nombreUsuario;"
         );
         
         if (result.length === 0)
@@ -152,7 +152,7 @@ export const getClientes = async (req, res) => {
 export const getUsuarioPorTelefono = async (req, res) => {
     try {
         const [result] = await pool.query(
-            "SELECT * FROM usuario WHERE telefonoUsuario LIKE CONCAT(?, '%');", [
+            "SELECT * FROM usuario WHERE telefonoUsuario LIKE CONCAT(?, '%') ORDER BY nombreUsuario;", [
                 req.params.telefono,
             ]);
         
@@ -167,7 +167,7 @@ export const getUsuarioPorTelefono = async (req, res) => {
 
 export const getLocalesAbiertosAhora = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT nombreTienda, horaAperturaHorario, horaCierreHorario FROM horario h, tienda t WHERE TIME(now()) < horaCierreHorario AND TIME(now()) > horaAperturaHorario AND (dayofweek(NOW())+5) mod 7 = diaSemanaHorario AND h.idTienda = t.idTienda;");
+        const [result] = await pool.query("SELECT nombreTienda, horaAperturaHorario, horaCierreHorario FROM horario h, tienda t WHERE TIME(now()) < horaCierreHorario AND TIME(now()) > horaAperturaHorario AND (dayofweek(NOW())+5) mod 7 = diaSemanaHorario AND h.idTienda = t.idTienda ORDER BY nombreTienda;");
 
         if (result.length === 0)
             return res.status(404).json({ message: "Ninguna tienda abierta" });
@@ -285,7 +285,7 @@ export const getPedidosPorCliente = async (req, res) => {
 // Quién generó el pedido
 export const getPedidosPorGenerado = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT *, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fechaPedido FROM pedido p, usuario u, tienda t WHERE idUsuario = idGenerado AND t.idTienda=p.idTienda AND nombreUsuario = ? ORDER BY fechaPedido, horaPedido LIMIT 50;", [
+        const [result] = await pool.query("SELECT *, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fechaPedido FROM pedido p, usuario u, tienda t WHERE t.idTienda=p.idTienda AND generadoPor = ? ORDER BY fechaPedido, horaPedido LIMIT 50;", [
             req.params.usuario,
             req.params.limit
         ]);
@@ -301,7 +301,7 @@ export const getPedidosPorGenerado = async (req, res) => {
 
 export const getPedidosPorFecha = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT *, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fechaPedido FROM pedido p, tienda t WHERE ? <= fechaPedido AND fechaPedido <= ? AND t.idTienda=p.idTienda", [
+        const [result] = await pool.query("SELECT *, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fechaPedido FROM pedido p, tienda t WHERE ? <= fechaPedido AND fechaPedido <= ? AND t.idTienda=p.idTienda ORDER BY fechaPedido, horaPedido", [
             req.params.fechaIni,
             req.params.fechaFin,
         ]);
@@ -400,7 +400,7 @@ export const getCountPedidosPorMotorizado = async (req, res) => {
         ]);
 
         if (result.length === 0)
-            return res.status(404).json({ message: "No hay pedidos de esta tienda" });
+            return res.status(404).json({ message: "No hay pedidos de este motorizado" });
 
         res.json(result[0]["COUNT(*)"]);
     } catch (error) {
@@ -416,7 +416,7 @@ export const getConsolidadoMotorizados = async (req, res) => {
         ]);
 
         if (result.length === 0)
-            return res.status(404).json({ message: "No hay pedidos de este mes" });
+            return res.status(404).json({ message: "No hay pedidos registrados" });
 
         res.json(result);
     } catch (error) {
@@ -432,7 +432,7 @@ export const getConsolidadoTransferencias = async (req, res) => {
         ]);
 
         if (result.length === 0)
-            return res.status(404).json({ message: "No hay pedidos de este mes" });
+            return res.status(404).json({ message: "No hay transferencias" });
 
         res.json(result);
     } catch (error) {
@@ -448,7 +448,7 @@ export const getConsolidadoLocales = async (req, res) => {
         ]);
 
         if (result.length === 0)
-            return res.status(404).json({ message: "No hay pedidos de este mes" });
+            return res.status(404).json({ message: "No hay pedidos de esta tienda" });
 
         res.json(result);
     } catch (error) {
@@ -478,10 +478,10 @@ export const createTipoLocal = async (req, res) => {
 
 export const createTienda = async (req, res) => {
     try {
-        const { idTipoLocal, nombreTienda, direccionTienda, telefonoTienda, urlBannerTienda, urlPerfilTienda, latTienda, longTienda, estadoTienda, tiempoPreparacionTienda, fechaActualizacionTienda } = req.body;
+        const { idTipoLocal, nombreTienda, direccionTienda, telefonoTienda, urlBannerTienda, urlPerfilTienda, coordenadasTienda, estadoTienda, tiempoPreparacionTienda, fechaActualizacionTienda } = req.body;
         const [result] = await pool.query(
-            "INSERT INTO tienda (idTipoLocal, nombreTienda, direccionTienda, telefonoTienda, urlBannerTienda, urlPerfilTienda, latTienda, longTienda, estadoTienda, tiempoPreparacionTienda, fechaActualizacionTienda) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-            [idTipoLocal, nombreTienda, direccionTienda, telefonoTienda, urlBannerTienda, urlPerfilTienda, latTienda, longTienda, estadoTienda, tiempoPreparacionTienda, fechaActualizacionTienda]
+            "INSERT INTO tienda (idTipoLocal, nombreTienda, direccionTienda, telefonoTienda, urlBannerTienda, urlPerfilTienda, coordenadasTienda, estadoTienda, tiempoPreparacionTienda, fechaActualizacionTienda) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+            [idTipoLocal, nombreTienda, direccionTienda, telefonoTienda, urlBannerTienda, urlPerfilTienda, coordenadasTienda, estadoTienda, tiempoPreparacionTienda, fechaActualizacionTienda]
         );
         res.json({
             id: result.insertId,
@@ -491,8 +491,7 @@ export const createTienda = async (req, res) => {
             telefonoTienda,
             urlBannerTienda,
             urlPerfilTienda,
-            latTienda,
-            longTienda,
+            coordenadasTienda,
             estadoTienda,
             tiempoPreparacionTienda,
             fechaActualizacionTienda
@@ -621,7 +620,7 @@ export const createUbicacion = async (req, res) => {
         const { idUsuario, telefonoUbicacion, direccionUbicacion, coordenadasUbicacion, referenciaUbicacion, asuntoUbicacion } = req.body;
         const [result] = await pool.query(
             "INSERT INTO ubicacion (idUsuario, telefonoUbicacion, direccionUbicacion, coordenadasUbicacion, referenciaUbicacion, asuntoUbicacion) VALUES (?, ?, ?, ?, ?, ?);",
-            [idUsuario, telefonoUbicacion, direccionUbicacion, coordenadasUbicacion,  referenciaUbicacion, asuntoUbicacion]
+            [idUsuario, telefonoUbicacion, direccionUbicacion, coordenadasUbicacion, referenciaUbicacion, asuntoUbicacion]
         );
         res.json({
             id: result.insertId,
@@ -914,14 +913,59 @@ export const updateTransferencia = async (req, res) => {
 
 //ELIMINAR
 
-export const deleteDetallePedido = async (req, res) => {
+export const deleteTipoLocal = async (req, res) => {
     try {
-        const [result] = await pool.query("DELETE FROM detallepedido WHERE idDetallePedido = ?", [
+        const result = await pool.query("DELETE FROM tipolocal WHERE idTipoLocal = ?", [
             req.params.id,
         ]);
 
         if (result.affectedRows === 0)
-            return res.status(404).json({ message: "Detalle no encontrado" });
+            return res.status(404).json({ message: "Tipo de local no encontrado" });
+
+        return res.sendStatus(204);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteTienda = async (req, res) => {
+    try {
+        const result = await pool.query("DELETE FROM tienda WHERE idTienda = ?", [
+            req.params.id,
+        ]);
+
+        if (result.affectedRows === 0)
+            return res.status(404).json({ message: "Tienda no encontrada" });
+
+        return res.sendStatus(204);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteHorario = async (req, res) => {
+    try {
+        const result = await pool.query("DELETE FROM horario WHERE idHorario = ?", [
+            req.params.id,
+        ]);
+
+        if (result.affectedRows === 0)
+            return res.status(404).json({ message: "Horario no encontrado" });
+
+        return res.sendStatus(204);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteTipoProducto = async (req, res) => {
+    try {
+        const result = await pool.query("DELETE FROM tipoproducto WHERE idTipoProducto = ?", [
+            req.params.id,
+        ]);
+
+        if (result.affectedRows === 0)
+            return res.status(404).json({ message: "Tipo de producto no encontrado" });
 
         return res.sendStatus(204);
     } catch (error) {
@@ -937,6 +981,141 @@ export const deleteProducto = async (req, res) => {
 
         if (result.affectedRows === 0)
             return res.status(404).json({ message: "Producto no encontrado" });
+
+        return res.sendStatus(204);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteTipoUsuario = async (req, res) => {
+    try {
+        const result = await pool.query("DELETE FROM tipousuario WHERE idTipoUsuario = ?", [
+            req.params.id,
+        ]);
+
+        if (result.affectedRows === 0)
+            return res.status(404).json({ message: "Tipo de usuario no encontrado" });
+
+        return res.sendStatus(204);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteUsuario = async (req, res) => {
+    try {
+        const result = await pool.query("DELETE FROM usuario WHERE idUsuario = ?", [
+            req.params.id,
+        ]);
+
+        if (result.affectedRows === 0)
+            return res.status(404).json({ message: "Usuario no encontrado" });
+
+        return res.sendStatus(204);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteUbicacion = async (req, res) => {
+    try {
+        const result = await pool.query("DELETE FROM ubicacion WHERE idUbicacion = ?", [
+            req.params.id,
+        ]);
+
+        if (result.affectedRows === 0)
+            return res.status(404).json({ message: "Ubicación no encontrada" });
+
+        return res.sendStatus(204);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteDescuento = async (req, res) => {
+    try {
+        const result = await pool.query("DELETE FROM descuento WHERE idDescuento = ?", [
+            req.params.id,
+        ]);
+
+        if (result.affectedRows === 0)
+            return res.status(404).json({ message: "Descuento no encontrado" });
+
+        return res.sendStatus(204);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const deletePedido = async (req, res) => {
+    try {
+        const result = await pool.query("DELETE FROM pedido WHERE idPedido = ?", [
+            req.params.id,
+        ]);
+
+        if (result.affectedRows === 0)
+            return res.status(404).json({ message: "Pedido no encontrado" });
+
+        return res.sendStatus(204);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteDetallePedido = async (req, res) => {
+    try {
+        const [result] = await pool.query("DELETE FROM detallepedido WHERE idDetallePedido = ?", [
+            req.params.id,
+        ]);
+
+        if (result.affectedRows === 0)
+            return res.status(404).json({ message: "Detalle de pedido no encontrado" });
+
+        return res.sendStatus(204);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteVarianteProducto = async (req, res) => {
+    try {
+        const result = await pool.query("DELETE FROM variante_producto WHERE idVariante_producto = ?", [
+            req.params.id,
+        ]);
+
+        if (result.affectedRows === 0)
+            return res.status(404).json({ message: "Variante de producto no encontrado" });
+
+        return res.sendStatus(204);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteTipoTransferencia = async (req, res) => {
+    try {
+        const result = await pool.query("DELETE FROM tipotransferencia WHERE idTipoTransferencia = ?", [
+            req.params.id,
+        ]);
+
+        if (result.affectedRows === 0)
+            return res.status(404).json({ message: "Tipo de transferencia no encontrado" });
+
+        return res.sendStatus(204);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteTransferencia = async (req, res) => {
+    try {
+        const result = await pool.query("DELETE FROM transferencia WHERE idTransferencia = ?", [
+            req.params.id,
+        ]);
+
+        if (result.affectedRows === 0)
+            return res.status(404).json({ message: "Transferencia no encontrada" });
 
         return res.sendStatus(204);
     } catch (error) {
