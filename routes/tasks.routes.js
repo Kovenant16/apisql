@@ -60,7 +60,9 @@ import {
   deleteProducto,
   deleteDetallePedido,
   getPedidosPorMotorizadoPorEstado,
-  getUsuarioPorTelefono
+  getUsuarioPorTelefono,
+  getUsuarioPorNombre,
+  getPedidoPorId
 } from "../controllers/tasks.controllers.js";
 
 const router = Router();
@@ -127,6 +129,11 @@ router.get("/consolidadoMotorizados/:fechaIni/:fechaFin", getConsolidadoMotoriza
 router.get("/consolidadoTransferencias/:fechaIni/:fechaFin", getConsolidadoTransferencias);
 
 router.get("/consolidadoLocales/:fechaIni/:fechaFin", getConsolidadoLocales);
+
+router.get("/usuarioPorNombre/:nombre", getUsuarioPorNombre);
+
+
+router.get("/pedidoPorId/:id", getPedidoPorId);
 
 
 router.post("/crearTipoLocal", createTipoLocal);
