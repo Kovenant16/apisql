@@ -317,7 +317,7 @@ export const getPedidosPorFecha = async (req, res) => {
 
 export const getDetallePedido = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT d.idPedido, CONCAT(p.nombreProducto, ' ',V.nombreVariante) descripcion, v.precioVariante, d.cantidadDetalle cantidad, v.precioVariante * d.cantidadDetalle subtotal FROM detallepedido d, producto p, variante_producto v WHERE d.idVariante_producto = v.idVariante_producto AND p.idProducto=v.idProducto AND d.idPedido = ?;", [
+        const [result] = await pool.query("SELECT d.idPedido, CONCAT(p.nombreProducto, ' ',v.nombreVariante) descripcion, v.precioVariante, d.cantidadDetalle cantidad, v.precioVariante * d.cantidadDetalle subtotal FROM detallepedido d, producto p, variante_producto v WHERE d.idVariante_producto = v.idVariante_producto AND p.idProducto=v.idProducto AND d.idPedido = ?;", [
             req.params.id,
         ]);
 
