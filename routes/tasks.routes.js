@@ -62,7 +62,19 @@ import {
   getPedidosPorMotorizadoPorEstado,
   getUsuarioPorTelefono,
   getUsuarioPorNombre,
-  getPedidoPorId
+  getPedidoPorId,
+  deleteTipoLocal,
+  deleteTienda,
+  deleteHorario,
+  deleteTipoProducto,
+  deleteTipoUsuario,
+  deleteUsuario,
+  deleteUbicacion,
+  deleteDescuento,
+  deletePedido,
+  deleteVarianteProducto,
+  deleteTipoTransferencia,
+  deleteTransferencia
 } from "../controllers/tasks.controllers.js";
 
 const router = Router();
@@ -107,12 +119,15 @@ router.get("/pedidosPorMotorizadoPorEstado/:motorizado/:estado", getPedidosPorMo
 
 router.get("/pedidosPorCliente/:cliente", getPedidosPorCliente);
 
-
 router.get("/pedidosPorUsuario/:usuario", getPedidosPorGenerado);
 
 router.get("/pedidosPorFecha/:fechaIni/:fechaFin", getPedidosPorFecha);
 
 router.get("/detallePedido/:id", getDetallePedido);
+
+router.get("/usuarioPorNombre/:nombre", getUsuarioPorNombre);
+
+router.get("/pedidoPorId/:id", getPedidoPorId);
 
 router.get("/cantidadTiendas", getCountTiendas);
 
@@ -129,11 +144,6 @@ router.get("/consolidadoMotorizados/:fechaIni/:fechaFin", getConsolidadoMotoriza
 router.get("/consolidadoTransferencias/:fechaIni/:fechaFin", getConsolidadoTransferencias);
 
 router.get("/consolidadoLocales/:fechaIni/:fechaFin", getConsolidadoLocales);
-
-router.get("/usuarioPorNombre/:nombre", getUsuarioPorNombre);
-
-
-router.get("/pedidoPorId/:id", getPedidoPorId);
 
 
 router.post("/crearTipoLocal", createTipoLocal);
@@ -194,8 +204,34 @@ router.put("/actualizarTipoTransferencia/:id", updateTipoTransferencia);
 router.put("/actualizarTransferencia/:id", updateTransferencia);
 
 
+
+
+router.delete("/borrarTipoLocal/:id", deleteTipoLocal);
+
+router.delete("/borrarTienda/:id", deleteTienda);
+
+router.delete("/borrarHorario/:id", deleteHorario);
+
+router.delete("/borrarTipoProducto/:id", deleteTipoProducto);
+
 router.delete("/borrarProducto/:id", deleteProducto);
 
+router.delete("/borrarTipoUsuario/:id", deleteTipoUsuario);
+
+router.delete("/borrarUsuario/:id", deleteUsuario);
+
+router.delete("/borrarUbicacion/:id", deleteUbicacion);
+
+router.delete("/borrarDescuento/:id", deleteDescuento);
+
+router.delete("/borrarPedido/:id", deletePedido);
+
 router.delete("/borrarDetallePedido/:id", deleteDetallePedido);
+
+router.delete("/borrarVarianteProducto/:id", deleteVarianteProducto);
+
+router.delete("/borrarTipoTransferencia/:id", deleteTipoTransferencia);
+
+router.delete("/borrarTransferencia/:id", deleteTransferencia);
 
 export default router;
