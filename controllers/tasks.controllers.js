@@ -11,6 +11,17 @@ export const getPedidosPendientes = async (req, res) => {
     }
 };
 
+export const getUsuariosConUbicacion = async (req, res) => {
+    try {
+        const [result] = await pool.query(
+            "select * from usuario u inner join ubicacion w on (u.idUsuario = w.idUsuario) order by u.nombreUsuario"
+        );
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 export const getProductos = async (req, res) => {
     try {
         const [result] = await pool.query(

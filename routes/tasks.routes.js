@@ -74,12 +74,15 @@ import {
   deletePedido,
   deleteVarianteProducto,
   deleteTipoTransferencia,
-  deleteTransferencia
+  deleteTransferencia,
+  getUsuariosConUbicacion
 } from "../controllers/tasks.controllers.js";
 
 const router = Router();
 
 router.get("/pedidosPendientes", getPedidosPendientes);
+
+router.get("/usuariosConUbicacion", getUsuariosConUbicacion);
 
 router.get("/productos", getProductos);
 
