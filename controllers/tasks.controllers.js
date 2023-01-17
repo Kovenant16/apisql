@@ -22,6 +22,23 @@ export const getUsuariosConUbicacion = async (req, res) => {
     }
 };
 
+export const getUsuarioAuth = async (req, res) => {
+    try {
+        const [result] = await pool.query("SELECT * FROM usuario WHERE nombreUsuario=? AND contraseñaUsuario=?;", [
+            req.params.nombreUsuario,
+            req.params.contraseñaUsuario
+        ]);
+
+        if (result.length === 0)
+            return res.status(404).json({ message: "Usuario o Contraseña no existen" });
+
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+
 export const getProductos = async (req, res) => {
     try {
         const [result] = await pool.query(

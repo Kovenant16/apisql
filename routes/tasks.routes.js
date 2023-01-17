@@ -75,7 +75,8 @@ import {
   deleteVarianteProducto,
   deleteTipoTransferencia,
   deleteTransferencia,
-  getUsuariosConUbicacion
+  getUsuariosConUbicacion,
+  getUsuarioAuth
 } from "../controllers/tasks.controllers.js";
 
 const router = Router();
@@ -147,6 +148,8 @@ router.get("/consolidadoMotorizados/:fechaIni/:fechaFin", getConsolidadoMotoriza
 router.get("/consolidadoTransferencias/:fechaIni/:fechaFin", getConsolidadoTransferencias);
 
 router.get("/consolidadoLocales/:fechaIni/:fechaFin", getConsolidadoLocales);
+
+router.get("/usuarioAuth/:nombreUsuario/:contraseñaUsuario", getUsuarioAuth);
 
 
 router.post("/crearTipoLocal", createTipoLocal);
