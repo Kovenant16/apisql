@@ -149,7 +149,7 @@ export const getTipoUsuario = async (req, res) => {
 
 export const getUsuarioPorTipo = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT u.idUsuario, u.nombreUsuario, contraseñaUsuario FROM usuario u, tipousuario tu WHERE u.idTipoUsuario = tu.idTipoUsuario AND nombreTipoUsuario = ? ORDER BY nombreUsuario ASC;", [
+        const [result] = await pool.query("SELECT *, u.idUsuario, u.nombreUsuario, contraseñaUsuario FROM usuario u, tipousuario tu WHERE u.idTipoUsuario = tu.idTipoUsuario AND nombreTipoUsuario = ? ORDER BY nombreUsuario ASC;", [
             req.params.nombreTipoUsuario,
         ]);
 
