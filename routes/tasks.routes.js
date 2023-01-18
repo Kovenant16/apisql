@@ -76,7 +76,8 @@ import {
   deleteTipoTransferencia,
   deleteTransferencia,
   getUsuariosConUbicacion,
-  getUsuarioAuth
+  getUsuarioAuth,
+  getUsuarioPorId
 } from "../controllers/tasks.controllers.js";
 
 const router = Router();
@@ -130,6 +131,8 @@ router.get("/pedidosPorFecha/:fechaIni/:fechaFin", getPedidosPorFecha);
 router.get("/detallePedido/:id", getDetallePedido);
 
 router.get("/usuarioPorNombre/:nombre", getUsuarioPorNombre);
+
+router.get("/usuarioPorID/:id", getUsuarioPorId);
 
 router.get("/pedidoPorId/:id", getPedidoPorId);
 

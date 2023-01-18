@@ -434,6 +434,21 @@ export const getUsuarioPorNombre = async (req, res) => {
     }
 };
 
+export const getUsuarioPorId = async (req, res) => {
+    try {
+        const [result] = await pool.query("SELECT * FROM usuario WHERE idUsuario = ?;", [
+            req.params.id,
+        ]);
+
+        if (result.length === 0)
+            return res.status(404).json({ message: "Usuario no existe" });
+
+        res.json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message + ' - Corregir' });
+    }
+};
+
 export const getPedidoPorId = async (req, res) => {
     try {
         const [result] = await pool.query("SELECT *, idPedido, (select nombreUsuario from usuario where idUsuario=idMotorizado) motorizado, (select nombreUsuario from usuario where idUsuario=idCliente) cliente, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fecha, horaPedido, montoPedido, comisionVentaPedido, montoDeliveryPedido, horaLlegadaLocalPedido, horaRecojoPedido, estadoPedido, nombreTienda, asuntoUbicacion, direccionUbicacion, coordenadasUbicacion, telefonoUbicacion, referenciaUbicacion FROM pedido p, usuario us, ubicacion ub, tienda t WHERE us.idUsuario=p.idMotorizado AND ub.idUbicacion=p.idUbicacion AND t.idTienda=p.idTienda AND idPedido = ?;", [
