@@ -24,7 +24,7 @@ export const getUsuariosConUbicacion = async (req, res) => {
 
 export const getUsuarioAuth = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT * FROM usuario WHERE nombreUsuario=? AND contraseñaUsuario=?;", [
+        const [result] = await pool.query("SELECT * FROM usuario", [
             req.params.nombreUsuario,
             req.params.contraseñaUsuario
         ]);
