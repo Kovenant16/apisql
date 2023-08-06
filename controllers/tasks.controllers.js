@@ -3,7 +3,7 @@ import { pool } from "../db.js";
 export const getPedidosPendientes = async (req, res) => {
     try {
         const [result] = await pool.query(
-            "SELECT idPedido, (select nombreUsuario from usuario where idUsuario=idMotorizado) motorizado, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fecha, horaPedido, montoPedido,  comisionVentaPedido, montoDeliveryPedido, horaLlegadaLocalPedido, horaRecojoPedido, estadoPedido, nombreTienda, coordenadasTienda, direccionUbicacion, coordenadasUbicacion, telefonoUbicacion, referenciaUbicacion FROM pedido p, usuario us, ubicacion ub, tienda t WHERE us.idUsuario=p.idMotorizado AND ub.idUbicacion=p.idUbicacion AND t.idTienda=p.idTienda AND estadoPedido != 'Entregado' ORDER BY fechaPedido, horaPedido LIMIT 20;"
+            "SELECT idPedido, (select nombreUsuario from usuario where idUsuario=idUsuario) motorizado, DATE_FORMAT(fechaPedido, '%Y-%m-%d') fecha, horaPedido, montoPedido,  comisionVentaPedido, montoDeliveryPedido, horaLlegadaLocalPedido, horaRecojoPedido, estadoPedido, nombreTienda, coordenadasTienda, direccionUbicacion, coordenadasUbicacion, telefonoUbicacion, referenciaUbicacion FROM pedido p, usuario us, ubicacion ub, tienda t WHERE us.idUsuario=p.idMotorizado AND ub.idUbicacion=p.idUbicacion AND t.idTienda=p.idTienda AND estadoPedido != 'Entregado' ORDER BY fechaPedido, horaPedido LIMIT 20;"
         );
         res.json(result);
     } catch (error) {
@@ -167,7 +167,7 @@ export const getClientes = async (req, res) => {
         const [result] = await pool.query(
             "SELECT * FROM usuario us, ubicacion ub WHERE idTipoUsuario = 5 AND us.idUsuario=ub.idUsuario ORDER BY nombreUsuario;"
         );
-        
+
         if (result.length === 0)
             return res.status(404).json({ message: "Aún no se registran clientes" });
 
@@ -181,9 +181,9 @@ export const getUsuarioPorTelefono = async (req, res) => {
     try {
         const [result] = await pool.query(
             "SELECT * FROM usuario WHERE telefonoUsuario LIKE CONCAT(?, '%') ORDER BY nombreUsuario;", [
-                req.params.telefono,
-            ]);
-        
+            req.params.telefono,
+        ]);
+
         if (result.length === 0)
             return res.status(404).json({ message: "No existe usuario con este teléfono" });
 
@@ -620,10 +620,10 @@ export const createProducto = async (req, res) => {
         );
         res.json({
             id: result.insertId,
-            idTienda, 
-            idTipoProducto, 
-            nombreProducto, 
-            descripcionProducto, 
+            idTienda,
+            idTipoProducto,
+            nombreProducto,
+            descripcionProducto,
             urlImagenProducto
         });
     } catch (error) {
@@ -718,21 +718,21 @@ export const createPedido = async (req, res) => {
         );
         res.json({
             id: result.insertId,
-            idDescuento, 
-            idCliente, 
-            idMotorizado, 
-            generadoPor, 
+            idDescuento,
+            idCliente,
+            idMotorizado,
+            generadoPor,
             idUbicacion,
             idTienda,
-            fechaPedido, 
-            horaPedido, 
-            horaGeneradoPedido, 
-            montoPedido, 
+            fechaPedido,
+            horaPedido,
+            horaGeneradoPedido,
+            montoPedido,
             comisionVentaPedido,
-            montoDeliveryPedido, 
-            horaLlegadaLocalPedido, 
-            horaRecojoPedido, 
-            horaEntregaPedido, 
+            montoDeliveryPedido,
+            horaLlegadaLocalPedido,
+            horaRecojoPedido,
+            horaEntregaPedido,
             estadoPedido,
             detalleAdicionalPedido
         });
